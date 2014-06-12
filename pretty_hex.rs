@@ -14,7 +14,7 @@ impl PrettyHex {
         self.byte_no = 0;
     }
 
-    pub fn display(&mut self, buf: &[u8]) {
+    pub fn display(&mut self, buf: &Vec<u8>) {
         for i in buf.iter() {
             let mut j = format!("{:X}", *i);
             if *i < 16 {

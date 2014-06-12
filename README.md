@@ -1,7 +1,7 @@
-STUDY-RUSTYCAP
+Study-RustyCap
 ==============
 
-An experimental project to implement pcap processing in Rust language. Expect sharp edges
+An experimental project to implement pcap processing in Rust language. Expect to be rough around the edges
 
 LICENSE
 -------
