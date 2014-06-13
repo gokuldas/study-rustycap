@@ -18,16 +18,16 @@ Work completed
 --------------
 * Command line argument processing and file reading for pcap files
 * Hex pretty printer (for examining read out code)
+* PCap global header decoding
 
 Work in progress
 ----------------
-* PCap global header decoding
+* Packet header decoding
 
 TODO
 ----
 
 ###Major###
-* Packet header decoding
 * Packet data decoding
 * Subcommand processing
 * To be defined after completion of decoder
@@ -35,6 +35,8 @@ TODO
 ###Minor###
 * Add description for link types
 * Bugfix: Constant length line number for pretty printer
+* Bugfix: Line number for the first line of pretty printer
+* Big Endian record decoder
 
 ###Testing###
 * Decoding of Big Endian file
