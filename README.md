@@ -26,15 +26,15 @@ Work in progress
 TODO
 ----
 
-##Major##
+###Major###
 * Packet header decoding
 * Packet data decoding
 * Subcommand processing
 * To be defined after completion of decoder
 
-##Minor##
+###Minor###
 * Add description for link types
 * Bugfix: Constant length line number for pretty printer
 
-##Testing##
+###Testing###
 * Decoding of Big Endian file
