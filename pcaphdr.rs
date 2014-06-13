@@ -27,6 +27,7 @@ impl PcapHdrS {
     }
 
     pub fn display(&self) {
+        println!("PCAP GLOBAL HEADER DETAILS");
         println!("Magic number   : {:X}", self.magic_number);
         println!("Major version  : {:X}", self.version_major);
         println!("Minor version  : {:X}", self.version_minor);
@@ -37,3 +38,8 @@ impl PcapHdrS {
     }
 
 }
+
+/*
+TODO:
+1. Handle BEnd & LEnd cases separately
+*/

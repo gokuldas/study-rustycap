@@ -1,13 +1,13 @@
 
-//use pretty_hex::PrettyHex;
+use pretty_hex::PrettyHex;
 use pcaphdr::PcapHdrS;
 
 use std::io::{File, MemReader};
 use std::path::Path;
 use std::os::args;
-//use std::io::SeekStyle;
+use std::io::SeekSet;
 
-//mod pretty_hex;
+mod pretty_hex;
 mod pcaphdr;
 
 fn main() {
@@ -22,9 +22,10 @@ fn main() {
         Err(e)  => fail!("file error: {}", e),
         Ok(buf) => {
             let mut rdr = MemReader::new(buf);
-            //let mut hexprint = PrettyHex::new();
-            //hexprint.display(&mut rdr);
-            //rdr.seek(0, SeekSet); //Not expecting any failure
+            let mut hexprint = PrettyHex::new();
+            hexprint.display(&mut rdr);
+            rdr.seek(0, SeekSet);  //Not expecting any failure
+            println!("");
             match PcapHdrS::new(&mut rdr){
                 Err(e)  => println!("Failed to read global header: {}", e),
                 Ok(hdr) => hdr.display()
