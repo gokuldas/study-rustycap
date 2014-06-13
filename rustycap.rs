@@ -1,21 +1,14 @@
 
-use pretty_hex::PrettyHex;
+//use pretty_hex::PrettyHex;
+use pcaphdr::PcapHdrS;
+
 use std::io::{File, MemReader};
 use std::path::Path;
 use std::os::args;
+//use std::io::SeekStyle;
 
-mod pretty_hex;
-
-// PCAP Global Header structure
-struct PcapHdrS {
-    magic_number  : u32,  /* magic number */
-    version_major : u16,  /* major version number */
-    version_minor : u16,  /* minor version number */
-    thiszone      : i32,  /* GMT to local correction */
-    sigfigs       : u32,  /* accuracy of timestamps */
-    snaplen       : u32,  /* max length of captured packets, in octets */
-    network       : u32   /* data link type */
-}
+//mod pretty_hex;
+mod pcaphdr;
 
 fn main() {
     let argums = args();
@@ -29,15 +22,13 @@ fn main() {
         Err(e)  => fail!("file error: {}", e),
         Ok(buf) => {
             let mut rdr = MemReader::new(buf);
-            let mut hexprint = PrettyHex::new();
-            hexprint.display(&mut rdr);
+            //let mut hexprint = PrettyHex::new();
+            //hexprint.display(&mut rdr);
+            //rdr.seek(0, SeekSet); //Not expecting any failure
+            match PcapHdrS::new(&mut rdr){
+                Err(e)  => println!("Failed to read global header: {}", e),
+                Ok(hdr) => hdr.display()
+            }
         }
     }
 }
-
-/*impl PcapHdrS {
-
-    fn decode(buf: &Vec<u8>) {
-        if buf.len() < 24 {
-            fail!("Insufficient global header data");
-        } */
