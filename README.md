@@ -6,6 +6,10 @@ Implements processing of file structure described by wireshark wiki: http://wiki
 
 **Status:** Early Alpha. Expect to be rough around the edges.
 
+**Compile:** rustc rustycap.rs
+
+**Usage:** ./rustycap dumpfile
+
 LICENSE
 -------
 All code in repo under BSD 3-Clause license.
@@ -21,6 +25,16 @@ Work in progress
 
 TODO
 ----
+
+##Major##
 * Packet header decoding
 * Packet data decoding
+* Subcommand processing
 * To be defined after completion of decoder
+
+##Minor##
+* Add description for link types
+* Bugfix: Constant length line number for pretty printer
+
+##Testing##
+* Decoding of Big Endian file
