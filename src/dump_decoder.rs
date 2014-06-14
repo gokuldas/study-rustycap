@@ -1,7 +1,5 @@
-use std::io::{MemReader, IoResult, IoError, MismatchedFileTypeForOperation};
-use dump_decoder::custom_read::{leu32, leu16, lei32, beu32, beu16, bei32};
-
-mod custom_read;
+use std::io::{MemReader, SeekCur, IoResult, IoError, MismatchedFileTypeForOperation};
+use rec_decoder::RecDecoder;
 
 enum PcapFileType { NormLE, NormBE, HResLE, HResBE, Invalid, UnInit}
 
@@ -16,7 +14,8 @@ pub struct DumpDecoder {
 
     // Dump decoder info and states
     dump          : MemReader,
-    file_type     : PcapFileType
+    file_type     : PcapFileType,
+    records       : Vec<RecDecoder>
 }
 
 impl DumpDecoder {
@@ -30,38 +29,44 @@ impl DumpDecoder {
             snaplen       : 0,
             network       : 0,
             dump          : reader,
-            file_type     : UnInit
+            file_type     : UnInit,
+            records       : vec![]
         }
     }
 
     pub fn decode(&mut self) -> IoResult<()>{
-        let mut magic = 0;
-        try!(leu32(&mut self.dump, &mut magic));
+        let magic = try!(self.dump.read_le_u32());
         match magic {
             0xA1B2C3D4 => {
-                try!(leu16(&mut self.dump, &mut self.version_major));
-                try!(leu16(&mut self.dump, &mut self.version_minor));
-                try!(lei32(&mut self.dump, &mut self.thiszone));
-                try!(leu32(&mut self.dump, &mut self.sigfigs));
-                try!(leu32(&mut self.dump, &mut self.snaplen));
-                try!(leu32(&mut self.dump, &mut self.network));
+                self.version_major = try!(self.dump.read_le_u16());
+                self.version_minor = try!(self.dump.read_le_u16());
+                self.thiszone      = try!(self.dump.read_le_i32());
+                self.sigfigs       = try!(self.dump.read_le_u32());
+                self.snaplen       = try!(self.dump.read_le_u32());
+                self.network       = try!(self.dump.read_le_u32());
                 self.file_type = NormLE;
-                Ok(())
             }
             0xD4C3B2A1 => {
-                try!(beu16(&mut self.dump, &mut self.version_major));
-                try!(beu16(&mut self.dump, &mut self.version_minor));
-                try!(bei32(&mut self.dump, &mut self.thiszone));
-                try!(beu32(&mut self.dump, &mut self.sigfigs));
-                try!(beu32(&mut self.dump, &mut self.snaplen));
-                try!(beu32(&mut self.dump, &mut self.network));
+                self.version_major = try!(self.dump.read_be_u16());
+                self.version_minor = try!(self.dump.read_be_u16());
+                self.thiszone      = try!(self.dump.read_be_i32());
+                self.sigfigs       = try!(self.dump.read_be_u32());
+                self.snaplen       = try!(self.dump.read_be_u32());
+                self.network       = try!(self.dump.read_be_u32());
                 self.file_type = NormBE;
-                Ok(())
             }
-            _ => Err(IoError{kind: MismatchedFileTypeForOperation,
-                             desc: "File decode: Invalid file type",
-                             detail: None })
+            _ => return Err(IoError{kind: MismatchedFileTypeForOperation,
+                                    desc: "File decode: Invalid file type",
+                                    detail: None })
         }
+        while !self.dump.eof() {
+            let i = try!(RecDecoder::new(&mut self.dump));
+            match self.dump.seek(i.get_len(), SeekCur) {
+                Err(e) => return Err(e),
+                Ok(()) => self.records.push(i)
+            }
+        }
+        Ok(())
     }
 
     pub fn display(&self) {
@@ -77,6 +82,10 @@ impl DumpDecoder {
                 println!("Snap length    : {  }", self.snaplen);
                 println!("Link type      : {  }", self.network);
             }
+        }
+        for i in self.records.iter() {
+            println!("");
+            i.display();
         }
     }
 

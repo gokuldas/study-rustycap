@@ -8,7 +8,6 @@
 
 use pretty_hex::PrettyHex;
 use dump_decoder::DumpDecoder;
-//use rechdr::RecHdrS;
 
 use std::io::{File, MemReader};
 use std::path::Path;
@@ -17,7 +16,7 @@ use std::io::SeekSet;
 
 mod pretty_hex;
 mod dump_decoder;
-//mod rechdr;
+mod rec_decoder;
 
 fn main() {
     let argums = args();
@@ -37,15 +36,8 @@ fn main() {
             println!("");
             let mut decoder = DumpDecoder::new(rdr);
             match decoder.decode(){
-                Err(e)  => fail!("Failed to decode dump: {}", e),
-                Ok(hdr) => {
-                    decoder.display();
-                    /* println!("");
-                    match RecHdrS::new(&mut rdr){
-                        Err(e)   => println!("Failed to read record header: {}", e),
-                        Ok(rhdr) => rhdr.display()
-                    } */
-                }
+                Err(e) => fail!("Failed to decode dump: {}", e),
+                Ok(()) => decoder.display()
             }
         }
     }
