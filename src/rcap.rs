@@ -7,8 +7,8 @@
 #![crate_type = "bin"]
 
 use pretty_hex::PrettyHex;
-use pcaphdr::PcapHdrS;
-use rechdr::RecHdrS;
+use dump_decoder::DumpDecoder;
+//use rechdr::RecHdrS;
 
 use std::io::{File, MemReader};
 use std::path::Path;
@@ -16,8 +16,8 @@ use std::os::args;
 use std::io::SeekSet;
 
 mod pretty_hex;
-mod pcaphdr;
-mod rechdr;
+mod dump_decoder;
+//mod rechdr;
 
 fn main() {
     let argums = args();
@@ -35,15 +35,16 @@ fn main() {
             hexprint.display(&mut rdr);
             rdr.seek(0, SeekSet);  //Not expecting any failure
             println!("");
-            match PcapHdrS::new(&mut rdr){
-                Err(e)  => println!("Failed to read global header: {}", e),
+            let mut decoder = DumpDecoder::new(rdr);
+            match decoder.decode(){
+                Err(e)  => fail!("Failed to decode dump: {}", e),
                 Ok(hdr) => {
-                    hdr.display();
-                    println!("");
+                    decoder.display();
+                    /* println!("");
                     match RecHdrS::new(&mut rdr){
                         Err(e)   => println!("Failed to read record header: {}", e),
                         Ok(rhdr) => rhdr.display()
-                    }
+                    } */
                 }
             }
         }
