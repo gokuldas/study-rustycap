@@ -6,7 +6,7 @@ Implements processing of file structure described by wireshark wiki: http://wiki
 
 **Status:** Early Alpha. Expect to be rough around the edges.
 
-**Compile:** rustc rustycap.rs
+**Compile:** rustc src/rustycap.rs
 
 **Usage:** ./rcap dumpfile
 
@@ -20,11 +20,11 @@ Work completed
 * Hex pretty printer (for examining read out code)
 * PCap global header decoding
 * Packet header decoding
+* Code tree refactoring
 
 Work in progress
 ----------------
 * Decoder redesign
-* Code tree refactoring
 
 TODO
 ----

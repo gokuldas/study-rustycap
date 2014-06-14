@@ -1,4 +1,4 @@
-#![crate_id = "rcap#0.1pre"]
+#![crate_id = "rcap#0.1.0"]
 
 #![desc = "Project RustyCap"]
 #![license = "BSD"]
