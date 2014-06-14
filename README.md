@@ -8,7 +8,7 @@ Implements processing of file structure described by wireshark wiki: http://wiki
 
 **Compile:** rustc rustycap.rs
 
-**Usage:** ./rustycap dumpfile
+**Usage:** ./rcap dumpfile
 
 LICENSE
 -------
@@ -19,10 +19,12 @@ Work completed
 * Command line argument processing and file reading for pcap files
 * Hex pretty printer (for examining read out code)
 * PCap global header decoding
+* Packet header decoding
 
 Work in progress
 ----------------
-* Packet header decoding
+* Decoder redesign
+* Code tree refactoring
 
 TODO
 ----
@@ -37,6 +39,8 @@ TODO
 * Bugfix: Constant length line number for pretty printer
 * Bugfix: Line number for the first line of pretty printer
 * Big Endian record decoder
+* Documentation
+* Test case generation
 
 ###Testing###
 * Decoding of Big Endian file

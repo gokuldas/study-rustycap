@@ -1,3 +1,10 @@
+#![crate_id = "rcap#0.1pre"]
+
+#![desc = "Project RustyCap"]
+#![license = "BSD"]
+#![comment = "Experimental Rust language project for parsing pcap files"]
+
+#![crate_type = "bin"]
 
 use pretty_hex::PrettyHex;
 use pcaphdr::PcapHdrS;
