@@ -16,7 +16,8 @@ use std::io::SeekSet;
 
 mod pretty_hex;
 mod dump_decoder;
-mod rec_decoder;
+mod rec_descriptor;
+mod prototype;
 
 fn main() {
     let argums = args();

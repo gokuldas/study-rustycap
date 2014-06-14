@@ -1,7 +1,6 @@
 use std::io::{MemReader, SeekCur, IoResult, IoError, MismatchedFileTypeForOperation};
-use rec_decoder::RecDecoder;
-
-enum PcapFileType { NormLE, NormBE, HResLE, HResBE, Invalid, UnInit}
+use rec_descriptor::RecDescriptor;
+use prototype::{Descriptor, Endianness, BigEndian, LittleEndian, Unknown};
 
 pub struct DumpDecoder {
     // Global header information
@@ -14,8 +13,8 @@ pub struct DumpDecoder {
 
     // Dump decoder info and states
     dump          : MemReader,
-    file_type     : PcapFileType,
-    records       : Vec<RecDecoder>
+    endian        : Endianness,
+    records       : Vec<RecDescriptor>
 }
 
 impl DumpDecoder {
@@ -29,7 +28,7 @@ impl DumpDecoder {
             snaplen       : 0,
             network       : 0,
             dump          : reader,
-            file_type     : UnInit,
+            endian     : Unknown,
             records       : vec![]
         }
     }
@@ -44,7 +43,7 @@ impl DumpDecoder {
                 self.sigfigs       = try!(self.dump.read_le_u32());
                 self.snaplen       = try!(self.dump.read_le_u32());
                 self.network       = try!(self.dump.read_le_u32());
-                self.file_type = NormLE;
+                self.endian = LittleEndian;
             }
             0xD4C3B2A1 => {
                 self.version_major = try!(self.dump.read_be_u16());
@@ -53,15 +52,16 @@ impl DumpDecoder {
                 self.sigfigs       = try!(self.dump.read_be_u32());
                 self.snaplen       = try!(self.dump.read_be_u32());
                 self.network       = try!(self.dump.read_be_u32());
-                self.file_type = NormBE;
+                self.endian = BigEndian;
             }
             _ => return Err(IoError{kind: MismatchedFileTypeForOperation,
                                     desc: "File decode: Invalid file type",
                                     detail: None })
         }
         while !self.dump.eof() {
-            let i = try!(RecDecoder::new(&mut self.dump));
-            match self.dump.seek(i.get_len(), SeekCur) {
+            let mut i = RecDescriptor::new();
+            try!(i.init(&mut self.dump, self.endian));
+            match self.dump.seek(i.get_pl_size(), SeekCur) {
                 Err(e) => return Err(e),
                 Ok(()) => self.records.push(i)
             }
@@ -70,9 +70,8 @@ impl DumpDecoder {
     }
 
     pub fn display(&self) {
-        match self.file_type {
-            UnInit  => println!("Data not decoded"),
-            Invalid => println!("Invalid data dump"),
+        match self.endian {
+            Unknown => println!("Data not decoded"),
             _       => {
                 println!("PCAP GLOBAL HEADER DETAILS");
                 println!("Major version  : {  }", self.version_major);
