@@ -20,19 +20,17 @@ Work completed
 * Hex pretty printer (for examining read out code)
 * PCap global header decoding
 * Packet header decoding
-* Code tree refactoring
 
 Work in progress
 ----------------
-* Decoder redesign
+* Subcommand processing
 
 TODO
 ----
 
 ###Major###
 * Packet data decoding
-* Subcommand processing
-* To be defined after completion of decoder
+* To be defined
 
 ###Minor###
 * Add description for link types
