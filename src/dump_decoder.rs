@@ -1,4 +1,7 @@
-use std::io::{MemReader, IoResult, IoError, MismatchedFileTypeForOperation};
+use std::io::{MemReader, SeekSet, IoResult, IoError};
+use std::io::{InvalidInput, MismatchedFileTypeForOperation};
+
+use pretty_hex::PrettyHex;
 use rec_descriptor::RecDescriptor;
 use prototype::{Descriptor, Endianness, BigEndian, LittleEndian, Unknown};
 
@@ -34,6 +37,15 @@ impl DumpDecoder {
     }
 
     pub fn decode(&mut self) -> IoResult<()>{
+        match self.dump.seek(0, SeekSet) {
+            Ok(()) => (),
+            Err(e) => {
+                println!("Seek error: {}", e);
+                return Err(IoError{kind: InvalidInput,
+                                   desc: "Memory seek error",
+                                   detail: None });
+            }
+        }
         let magic = try!(self.dump.read_le_u32());
         match magic {
             0xA1B2C3D4 => {
@@ -69,7 +81,9 @@ impl DumpDecoder {
         Ok(())
     }
 
-    pub fn display(&self) {
+    pub fn display(&mut self) {
+        self.display_dump();
+        println!("");
         match self.endian {
             Unknown => println!("Data not decoded"),
             _       => {
@@ -84,10 +98,22 @@ impl DumpDecoder {
         }
         for i in self.records.iter() {
             println!("");
-            i.display();
+            i.display(&mut self.dump);
         }
     }
 
+    pub fn display_dump(&mut self){
+        match self.dump.seek(0, SeekSet) {
+            Ok(()) => (),
+            Err(e) => {
+                println!("Seek error: {}", e);
+                return;
+            }
+        }
+        let mut prntr = PrettyHex::new();
+        println!("FULL PCAP DUMP");
+        prntr.display(&mut self.dump, None);
+    }
 }
 
 /*

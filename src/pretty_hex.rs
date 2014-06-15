@@ -1,5 +1,6 @@
 
 use std::io::MemReader;
+use std::option::Option;
 
 pub struct PrettyHex {
     byte_no : u64
@@ -12,12 +13,16 @@ impl PrettyHex {
         PrettyHex {byte_no : 0}
     }
 
-    pub fn reset(&mut self) {
+    /*pub fn reset(&mut self) {
         self.byte_no = 0;
-    }
+    }*/
 
-    pub fn display(&mut self, reader: &mut MemReader) {
+    pub fn display(&mut self, reader: &mut MemReader, end: Option<u64>) {
+        let endloc = end.unwrap_or(0u64);
         while ! reader.eof() {
+            if end != None && self.byte_no == endloc {
+                break;
+            }
             match reader.read_u8() {
                 Err(e) => fail!("Memory read error: {}", e),
                 Ok(i)  => {

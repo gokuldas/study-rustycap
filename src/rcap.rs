@@ -6,13 +6,11 @@
 
 #![crate_type = "bin"]
 
-use pretty_hex::PrettyHex;
 use dump_decoder::DumpDecoder;
 
 use std::io::{File, MemReader};
 use std::path::Path;
 use std::os::args;
-use std::io::SeekSet;
 
 mod pretty_hex;
 mod dump_decoder;
@@ -30,11 +28,7 @@ fn main() {
     match file.read_to_end() {
         Err(e)  => fail!("file error: {}", e),
         Ok(buf) => {
-            let mut rdr = MemReader::new(buf);
-            let mut hexprint = PrettyHex::new();
-            hexprint.display(&mut rdr);
-            rdr.seek(0, SeekSet);  //Not expecting any failure
-            println!("");
+            let rdr = MemReader::new(buf);
             let mut decoder = DumpDecoder::new(rdr);
             match decoder.decode(){
                 Err(e) => fail!("Failed to decode dump: {}", e),

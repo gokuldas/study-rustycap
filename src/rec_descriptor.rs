@@ -1,7 +1,9 @@
 
-use std::io::{MemReader, SeekCur, IoResult, IoError, InvalidInput};
+use std::io::{MemReader, SeekCur, SeekSet, IoResult, IoError, InvalidInput};
 use std::option::Option;
 use prototype::{Descriptor, Endianness, LittleEndian, BigEndian, Unknown};
+
+use pretty_hex::PrettyHex;
 
 pub struct RecDescriptor {
     // Generic descriptor information (super struct use case)
@@ -54,7 +56,7 @@ impl Descriptor for RecDescriptor {
         Ok(())
     }
 
-    fn display(&self) {
+    fn display_details(&self) {
         println!("RECORD HEADER DETAILS");
         println!("Position     : {}", self.pl_begin);
         println!("Time(unix-s) : {}", self.ts_sec);
@@ -63,6 +65,31 @@ impl Descriptor for RecDescriptor {
         println!("Packet size  : {}", self.orig_len);
     }
 
+    fn display_raw_hdr(&self, reader: &mut MemReader) {
+        match reader.seek((self.pl_begin - 16) as i64, SeekSet) {
+            Ok(()) => (),
+            Err(e) => {
+                println!("Seek error: {}", e);
+                return;
+            }
+        }
+        let mut prntr = PrettyHex::new();
+        println!("RAW HEADER VALUES");
+        prntr.display(reader, Some(16));
+    }
+
+    fn display_raw_pl(&self, reader: &mut MemReader){
+        match reader.seek((self.pl_begin) as i64, SeekSet) {
+            Ok(()) => (),
+            Err(e) => {
+                println!("Seek error: {}", e);
+                return;
+            }
+        }
+        let mut prntr = PrettyHex::new();
+        println!("RAW PAYLOAD VALUES");
+        prntr.display(reader, Some(self.pl_size as u64));
+    }
 }
 
 /* TODO:
