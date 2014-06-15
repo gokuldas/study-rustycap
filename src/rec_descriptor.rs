@@ -1,7 +1,7 @@
 
-use std::io::{MemReader, IoResult};
+use std::io::{MemReader, IoResult, IoError, InvalidInput};
 use std::option::Option;
-use prototype::{Descriptor, Endianness};
+use prototype::{Descriptor, Endianness, LittleEndian, BigEndian, Unknown};
 
 pub struct RecDescriptor {
     // Generic descriptor information (super struct use case)
@@ -27,11 +27,25 @@ impl RecDescriptor {
 impl Descriptor for RecDescriptor {
 
     fn init(&mut self, reader: &mut MemReader, order: Endianness) -> IoResult<()> {
-        self.ts_sec   = try!(reader.read_le_u32());
-        self.ts_usec  = try!(reader.read_le_u32());
-        self.pl_size  = try!(reader.read_le_u32());
-        self.orig_len = try!(reader.read_le_u32());
-        self.pl_begin = try!(reader.tell()) as u32;
+        match order {
+            LittleEndian => {
+                self.ts_sec   = try!(reader.read_le_u32());
+                self.ts_usec  = try!(reader.read_le_u32());
+                self.pl_size  = try!(reader.read_le_u32());
+                self.orig_len = try!(reader.read_le_u32());
+                self.pl_begin = try!(reader.tell()) as u32;
+            }
+            BigEndian => {
+                self.ts_sec   = try!(reader.read_le_u32());
+                self.ts_usec  = try!(reader.read_le_u32());
+                self.pl_size  = try!(reader.read_le_u32());
+                self.orig_len = try!(reader.read_le_u32());
+                self.pl_begin = try!(reader.tell()) as u32;
+            }
+            Unknown => return Err(IoError{kind: InvalidInput,
+                                          desc: "Record decode: Unknown endianness",
+                                          detail: None })
+        }
         self.pl_desc  = None;
         Ok(())
     }

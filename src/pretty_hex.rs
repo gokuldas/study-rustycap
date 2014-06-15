@@ -2,7 +2,7 @@
 use std::io::MemReader;
 
 pub struct PrettyHex {
-    byte_no : uint
+    byte_no : u64
 }
 
 
@@ -23,7 +23,12 @@ impl PrettyHex {
                 Ok(i)  => {
                     match self.byte_no {
                         n if n % 16 == 0 => {
-                            print!("\n{:0>4X}: ", self.byte_no);
+                            if n != 0 {
+                                println!("");
+                            }
+                            let msbs = self.byte_no >> 32;
+                            let lsbs = self.byte_no & 0x0000FFFF;
+                            print!("{:0>4X} {:0>4X}: ", msbs, lsbs);
                         }
                         n if n % 4 == 0  => print!("  "),
                         _          => print!(" ")

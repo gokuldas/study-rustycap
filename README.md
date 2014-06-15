@@ -34,7 +34,6 @@ TODO
 
 ###Minor###
 * Add description for link types
-* Big Endian record decoder
 * Documentation/License
 * Test case generation
 
