@@ -21,20 +21,15 @@ impl PrettyHex {
             match reader.read_u8() {
                 Err(e) => fail!("Memory read error: {}", e),
                 Ok(i)  => {
-                    let mut j = format!("{:X}", i);
-                    if i < 16 {
-                        j = format!("0{:X}", i);
-                    }
-                    print!("{}", j);
-
-                    self.byte_no += 1;
                     match self.byte_no {
                         n if n % 16 == 0 => {
-                            print!("\n{:X}: ", self.byte_no);
+                            print!("\n{:0>4X}: ", self.byte_no);
                         }
                         n if n % 4 == 0  => print!("  "),
                         _          => print!(" ")
                     }
+                    print!("{:0>2X}", i);
+                    self.byte_no += 1;
                 }
             }
         }
@@ -43,5 +38,4 @@ impl PrettyHex {
 
 }
 
-// TODO: Implement function to set length of hex conversion (for line no)
 // TODO: Print line number for first row

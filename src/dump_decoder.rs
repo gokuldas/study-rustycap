@@ -28,7 +28,7 @@ impl DumpDecoder {
             snaplen       : 0,
             network       : 0,
             dump          : reader,
-            endian     : Unknown,
+            endian        : Unknown,
             records       : vec![]
         }
     }

@@ -34,8 +34,6 @@ TODO
 
 ###Minor###
 * Add description for link types
-* Bugfix: Constant length line number for pretty printer
-* Bugfix: Line number for the first line of pretty printer
 * Big Endian record decoder
 * Documentation/License
 * Test case generation
