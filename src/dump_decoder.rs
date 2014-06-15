@@ -1,4 +1,4 @@
-use std::io::{MemReader, SeekCur, IoResult, IoError, MismatchedFileTypeForOperation};
+use std::io::{MemReader, IoResult, IoError, MismatchedFileTypeForOperation};
 use rec_descriptor::RecDescriptor;
 use prototype::{Descriptor, Endianness, BigEndian, LittleEndian, Unknown};
 
@@ -61,7 +61,7 @@ impl DumpDecoder {
         while !self.dump.eof() {
             let mut i = RecDescriptor::new();
             try!(i.init(&mut self.dump, self.endian));
-            match self.dump.seek(i.get_pl_size(), SeekCur) {
+            match i.seek_next(&mut self.dump) {
                 Err(e) => return Err(e),
                 Ok(()) => self.records.push(i)
             }

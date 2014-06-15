@@ -1,5 +1,5 @@
 
-use std::io::{MemReader, IoResult, IoError, InvalidInput};
+use std::io::{MemReader, SeekCur, IoResult, IoError, InvalidInput};
 use std::option::Option;
 use prototype::{Descriptor, Endianness, LittleEndian, BigEndian, Unknown};
 
@@ -21,6 +21,10 @@ impl RecDescriptor {
             pl_begin : 0, pl_size : 0, pl_desc : None,
             ts_sec   : 0, ts_usec : 0, orig_len : 0
         }
+    }
+
+    pub fn seek_next(&self, reader: &mut MemReader) -> IoResult<()> {
+        reader.seek(self.pl_size as i64, SeekCur)
     }
 }
 
@@ -59,12 +63,8 @@ impl Descriptor for RecDescriptor {
         println!("Packet size  : {}", self.orig_len);
     }
 
-    fn get_pl_size(&self) -> i64{
-        self.pl_size as i64
-    }
 }
 
 /* TODO:
-1. Implement big endian reader after code refactoring
-2. Implement super-struct for all decriptors when inheritance matures
+1. Implement super-struct for all decriptors when inheritance matures
 */
