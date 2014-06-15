@@ -5,7 +5,7 @@ use prototype::{Descriptor, Endianness, LittleEndian, BigEndian, Unknown};
 
 pub struct RecDescriptor {
     // Generic descriptor information (super struct use case)
-    pl_begin : u32, /* position of packet payload in the buffer */
+    pl_begin : u64, /* position of packet payload in the buffer */
     pl_size  : u32, /* number of octets of packet saved in file */
     pl_desc  : Option<Box<Descriptor>>, /* Payload descriptor */
 
@@ -33,14 +33,14 @@ impl Descriptor for RecDescriptor {
                 self.ts_usec  = try!(reader.read_le_u32());
                 self.pl_size  = try!(reader.read_le_u32());
                 self.orig_len = try!(reader.read_le_u32());
-                self.pl_begin = try!(reader.tell()) as u32;
+                self.pl_begin = try!(reader.tell());
             }
             BigEndian => {
                 self.ts_sec   = try!(reader.read_le_u32());
                 self.ts_usec  = try!(reader.read_le_u32());
                 self.pl_size  = try!(reader.read_le_u32());
                 self.orig_len = try!(reader.read_le_u32());
-                self.pl_begin = try!(reader.tell()) as u32;
+                self.pl_begin = try!(reader.tell());
             }
             Unknown => return Err(IoError{kind: InvalidInput,
                                           desc: "Record decode: Unknown endianness",
